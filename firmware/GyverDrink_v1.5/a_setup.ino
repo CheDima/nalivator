@@ -1,7 +1,7 @@
 void setup() {
-#if (DEBUG_UART == 1)
+#if (DEBUG == 1)
   Serial.begin(9600);
-  DEBUG("start");
+  PRINTS("start");
 #endif
   // епром
   if (EEPROM.read(1000) != 10) {
@@ -14,7 +14,7 @@ void setup() {
   strip.setBrightness(130);
   strip.clear();
   strip.show();
-  DEBUG("strip init");
+  PRINTS("strip init");
 
   // настройка пинов
   pinMode(PUMP_POWER, 1);
@@ -22,12 +22,6 @@ void setup() {
   for (byte i = 0; i < NUM_SHOTS; i++) {
     if (SWITCH_LEVEL == 0) pinMode(SW_pins[i], INPUT_PULLUP);
   }
-
-  // старт дисплея
-  disp.clear();
-  disp.brightness(7);
-  DEBUG("disp init");
-
   // настройка серво
   servoON();
   servo.attach(SERVO_PIN, 600, 2400);
@@ -39,9 +33,8 @@ void setup() {
   servo.setSpeed(60);
   servo.setAccel(0.3);
   servoOFF();
-
+  PRINTS("Servo initialized");
   serviceMode();    // калибровка
-  dispMode();       // выводим на дисплей стандартные значения
   timeoutReset();   // сброс таймаута
   TIMEOUTtimer.start();
 }

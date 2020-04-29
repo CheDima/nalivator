@@ -1,5 +1,3 @@
-// луп
-
 void loop() {
   encTick();
   btnTick();

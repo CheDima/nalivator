@@ -1,7 +1,7 @@
 // мини-класс для работы с энкодером, версия 1.0
 
 class encMinim
-{
+{ 
   public:
     encMinim(uint8_t clk, uint8_t dt, uint8_t sw, boolean dir, boolean type);
     void tick();

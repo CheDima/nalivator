@@ -2,8 +2,8 @@
 
 void serviceMode() {
   if (!digitalRead(BTN_PIN)) {
-    byte serviceText[] = {_S, _E, _r, _U, _i, _C, _E};
-    disp.runningString(serviceText, sizeof(serviceText), 150);
+  PRINTS("Entered service mode");
+    disp.runningString("Service");
     while (!digitalRead(BTN_PIN));  // ждём отпускания
     delay(200);
     servoON();
@@ -68,9 +68,9 @@ void serviceMode() {
 // выводим объём и режим
 void dispMode() {
   disp.displayInt(thisVolume);
-  if (workMode) disp.displayByte(0, _A);
+  if (workMode) disp.displayByte(0, 'A');
   else {
-    disp.displayByte(0, _P);
+    disp.displayByte(0, 'P');
     pumpOFF();
   }
 }
@@ -85,8 +85,8 @@ void flowTick() {
         shotStates[i] = EMPTY;                                      // флаг на заправку
         strip.setLED(i, mCOLOR(RED));                               // подсветили
         LEDchanged = true;
-        DEBUG("set glass");
-        DEBUG(i);
+        //PRINTS("set glass");
+        //PRINTS(i);
       }
       if (!swState && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
         shotStates[i] = NO_GLASS;                                   // статус - нет рюмки
@@ -99,8 +99,8 @@ void flowTick() {
           WAITtimer.reset();
           pumpOFF();                                                // помпу выкл
         }
-        DEBUG("take glass");
-        DEBUG(i);
+        //PRINTS("take glass");
+        //PRINTS(i);
       }
     }
 
@@ -130,8 +130,8 @@ void flowRoutnie() {
         servoON();                                        // вкл питание серво
         servo.attach();
         servo.setTargetDeg(shotPos[curPumping]);          // задаём цель
-        DEBUG("find glass");
-        DEBUG(curPumping);
+        PRINTS("find glass");
+        //PRINTS(curPumping);
         break;
       }
     }
@@ -142,7 +142,7 @@ void flowRoutnie() {
         servoOFF();                                       // выключили серво
         systemON = false;                                 // выключили систему
         parking = true;
-        DEBUG("no glass");        
+        PRINTS("no glass");        
       }
     }
   } else if (systemState == MOVING) {                     // движение к рюмке
@@ -153,8 +153,8 @@ void flowRoutnie() {
       pumpON();                                           // НАЛИВАЙ!
       strip.setLED(curPumping, mCOLOR(YELLOW));           // зажгли цвет
       strip.show();
-      DEBUG("fill glass");
-      DEBUG(curPumping);
+      PRINTS("fill glass");
+      //PRINTS(curPumping);
     }
 
   } else if (systemState == PUMPING) {                    // если качаем
@@ -166,13 +166,13 @@ void flowRoutnie() {
       curPumping = -1;                                    // снимаем выбор рюмки
       systemState = WAIT;                                 // режим работы - ждать
       WAITtimer.reset();
-      DEBUG("wait");
+      PRINTS("wait");
     }
   } else if (systemState == WAIT) {
     if (WAITtimer.isReady()) {                            // подождали после наливания
       systemState = SEARCH;
       timeoutReset();
-      DEBUG("search");
+      PRINTS("search");
     }
   }
 }
@@ -191,13 +191,13 @@ void timeoutReset() {
   timeoutState = true;
   TIMEOUTtimer.reset();
   TIMEOUTtimer.start();
-  DEBUG("timeout reset");
+  PRINTS("timeout reset");
 }
-
+ 
 // сам таймаут
 void timeoutTick() {
   if (systemState == SEARCH && timeoutState && TIMEOUTtimer.isReady()) {
-    DEBUG("timeout");
+    PRINTS("timeout");
     timeoutState = false;
     disp.brightness(1);
     POWEROFFtimer.reset();
