@@ -7,11 +7,11 @@ void encTick() {
     timeoutReset();
     if (enc.isLeft()) {
       thisVolume += 5;
-      thisVolume = constrain(thisVolume, 5, 1000);
+      thisVolume = constrain(thisVolume, 5, 100);
     }
     if (enc.isRight()) {
       thisVolume -= 5;
-      thisVolume = constrain(thisVolume, 5, 1000);
+      thisVolume = constrain(thisVolume, 5, 100);
     }
     dispMode();
   }

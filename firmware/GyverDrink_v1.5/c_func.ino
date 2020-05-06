@@ -6,14 +6,13 @@ void serviceMode() {
     disp.runningString("Service");
     while (!digitalRead(BTN_PIN));  // ждём отпускания
     delay(200);
-    servoON();
     int servoPos = 0;
     long pumpTime = 0;
     timerMinim timer100(100);
     disp.displayInt(0);
     bool flag;
     for (;;) {
-      servo.tick();
+      rotator_servo.tick();
       enc.tick();
 
       if (timer100.isReady()) {   // период 100 мс
@@ -51,28 +50,24 @@ void serviceMode() {
         }
         servoPos = constrain(servoPos, 0, 180);
         disp.displayInt(servoPos);
-        servo.setTargetDeg(servoPos);
+        rotator_servo.setTargetDeg(servoPos);
       }
 
       if (btn.holded()) {
-        servo.setTargetDeg(0);
+        rotator_servo.setTargetDeg(0);
         break;
       }
     }
   }
   disp.clear();
-  while (!servo.tick());
-  servoOFF();
 }
 
 // выводим объём и режим
 void dispMode() {
-  disp.displayInt(thisVolume);
-  if (workMode) disp.displayByte(0, 'A');
-  else {
-    disp.displayByte(0, 'P');
-    pumpOFF();
-  }
+  if (!workMode) pumpOFF();
+  //disp.displayPercent(thisVolume);
+  disp.runTempEffect(MatrEffect::percent(thisVolume), 1500);
+  disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
 }
 
 // наливайка, опрос кнопок
@@ -125,28 +120,31 @@ void flowRoutnie() {
         noGlass = false;                                  // флаг что нашли хоть одну рюмку
         parking = false;
         curPumping = i;                                   // запоминаем выбор
-        systemState = MOVING;                             // режим - движение
-        shotStates[curPumping] = IN_PROCESS;              // стакан в режиме заполнения
-        servoON();                                        // вкл питание серво
-        servo.attach();
-        servo.setTargetDeg(shotPos[curPumping]);          // задаём цель
+        moveToUppermost();                                // we must not touch neighbour glasses
+        systemState = MOVING;                             
+        shotStates[curPumping] = IN_PROCESS;              
+        rotator_servo.setTargetDeg(shotPos[curPumping][Servos::ROTOR]);
+        lift_servo.setTargetDeg(shotPos[curPumping][Servos::LIFT]);
+        forward_servo.setTargetDeg(shotPos[curPumping][Servos::FORWARD]);
         PRINTS("find glass");
-        //PRINTS(curPumping);
         break;
       }
     }
     if (noGlass && !parking) {                            // если не нашли ни одной рюмки
-      servoON();
-      servo.setTargetDeg(0);                              // цель серво - 0
-      if (servo.tick()) {                                 // едем до упора
-        servoOFF();                                       // выключили серво
-        systemON = false;                                 // выключили систему
+      //servoON();
+      rotator_servo.setTargetDeg(parkingPosition[Servos::ROTOR]);
+      lift_servo.setTargetDeg(parkingPosition[Servos::LIFT]);
+      forward_servo.setTargetDeg(parkingPosition[Servos::FORWARD]);
+      if (rotator_servo.tick() && forward_servo.tick() && lift_servo.tick()) {
+        systemON = false;
         parking = true;
         PRINTS("no glass");        
       }
     }
-  } else if (systemState == MOVING) {                     // движение к рюмке
-    if (servo.tick()) {                                   // если приехали
+  } else if (systemState == MOVING) {
+    bool rotorCame = rotator_servo.tick();
+    bool forwardCame = forward_servo.tick();
+    if (rotorCame && forwardCame && lift_servo.tick()) {  // если приехали
       systemState = PUMPING;                              // режим - наливание
       FLOWtimer.setInterval((long)thisVolume * time50ml / 50);  // перенастроили таймер
       FLOWtimer.reset();                                  // сброс таймера
@@ -177,12 +175,22 @@ void flowRoutnie() {
   }
 }
 
+void moveToUppermost() {
+  PRINTS("Move to upper position");
+//  lift_servo.setTargetDeg(UPPER_POSITION);
+  //  while (!lift_servo.tick()); 
+}
+
 // отрисовка светодиодов по флагу (100мс)
 void LEDtick() {
   if (LEDchanged && LEDtimer.isReady()) {
     LEDchanged = false;
     strip.show();
   }
+}
+
+void displayTick() {
+  disp.tick();
 }
 
 // сброс таймаута
@@ -221,12 +229,12 @@ void timeoutTick() {
 void jerkServo() {
   if (KEEP_POWER) {
     disp.brightness(7);
-    servoON();
-    servo.attach();
-    servo.write(random(0, 4));
+    //servoON();
+    rotator_servo.attach();
+    rotator_servo.write(random(0, 4));
     delay(200);
-    servo.detach();
-    servoOFF();
+    rotator_servo.detach();
+    //servoOFF();
     disp.brightness(1);
   }
 }

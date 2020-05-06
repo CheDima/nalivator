@@ -3,5 +3,6 @@ void loop() {
   btnTick();
   flowTick();
   LEDtick();
+  displayTick();
   timeoutTick();
 }
