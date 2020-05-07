@@ -65,9 +65,12 @@ void serviceMode() {
 // выводим объём и режим
 void dispMode() {
   if (!workMode) pumpOFF();
-  //disp.displayPercent(thisVolume);
+
   disp.runTempEffect(MatrEffect::percent(thisVolume), 1500);
-  disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
+  //disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
+  
+  uint8_t* sprites[] = {heartFull, heartEmpty};
+  disp.setEffect(MatrEffect::animation(sprites, 2));
 }
 
 // наливайка, опрос кнопок
