@@ -13,8 +13,9 @@
 const byte shotPos[NUM_SHOTS][3] = {{135, 120, 120}, {150, 100, 60}, {100, 100, 50}, {100, 120, 110}};
 
 enum Servos {ROTOR, LIFT, FORWARD};
-const byte parkingPosition[3] = {10, 70, 40};  // See Servos enum
 const byte UPPER_POSITION = 125;
+const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
+
 
 
 

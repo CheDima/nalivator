@@ -14,7 +14,7 @@ class MatrEffect {
   public:
     MatrEffect( EffectType t, EffectParam param);
     MatrEffect();
-    void refresh(MD_MAX72XX *device);
+    void refresh(MD_MAX72XX *device, bool forceRefresh);
     static MatrEffect sprite(Sprite sp);
     static MatrEffect symbol(char ch);
     static MatrEffect percent(int val);
@@ -59,25 +59,30 @@ MatrEffect MatrEffect::symbol(char ch) {
   return MatrEffect(SYMBOL, par);
 }
 
+//TODO
+//void displayInt(int val) {
+//  char buffer [3];
+//  runningString(itoa(val, buffer, 10));
+//}
+
 MatrEffect::MatrEffect(EffectType t, EffectParam p) {
   param = p;
   type = t;
 }
 
-void MatrEffect::refresh(MD_MAX72XX *mx) {
+void MatrEffect::refresh(MD_MAX72XX *mx, bool forceRefresh) {
 
-  if(needsRefresh) {
+  if(needsRefresh || forceRefresh) {
    if(type == ANIMATION) {
-     //PRINTS("Bitch4");
      EVERY_MS(500) {
+      for (uint8_t i=0; i<8; i++) mx->setRow(i, param.spritesList.getCurrent()[i]);
       if (!param.spritesList.next()) param.spritesList.moveToStart();
-      for (uint8_t i=0; i<8; i++) mx->setColumn(i, param.spritesList.getCurrent()[i]);
       needsRefresh = true;
      }
    }
   switch(type) {
     case(SPRITE):
-      for (uint8_t i=0; i<8; i++) mx->setColumn(i, param.sprites[0][i]);
+      for (uint8_t i=0; i<8; i++) mx->setRow(i, param.sprites[0][i]);
       needsRefresh = false;
       break;
     case(SYMBOL):

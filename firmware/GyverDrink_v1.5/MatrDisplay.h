@@ -13,7 +13,6 @@ class MatrDisplay {
   public:
     void runningString(char* p);
     void brightness(int val);
-    void displayInt(int val);
     void clear();
     void setEffect(MatrEffect ef);
     void runTempEffect(MatrEffect ef, uint32_t timeout);
@@ -45,22 +44,18 @@ void MatrDisplay::runTempEffect(MatrEffect ef, uint32_t timeoutMs) {
 void MatrDisplay::tick() {
   if (tempStartTime > 0) {
     if (millis() - tempStartTime < tempTimeout) {
-      tempEffect.refresh(&mx);  
+      tempEffect.refresh(&mx, false);
     } else {
       tempStartTime = 0;
+      mainEffect.refresh(&mx, true);
     }
   } else {
-    mainEffect.refresh(&mx);  
+    mainEffect.refresh(&mx, false);
   }
 }
 
 void MatrDisplay::clear() {
   mx.clear();
-}
-
-void MatrDisplay::displayInt(int val) {
-  char buffer [3];
-  runningString(itoa(val, buffer, 10));
 }
 
 void MatrDisplay::brightness(int val) {

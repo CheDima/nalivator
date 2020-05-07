@@ -9,7 +9,7 @@ void serviceMode() {
     int servoPos = 0;
     long pumpTime = 0;
     timerMinim timer100(100);
-    disp.displayInt(0);
+    //disp.displayInt(0);
     bool flag;
     for (;;) {
       rotator_servo.tick();
@@ -20,7 +20,7 @@ void serviceMode() {
         if (!digitalRead(ENC_SW)) {
           if (flag) pumpTime += 100;
           else pumpTime = 0;
-          disp.displayInt(pumpTime);
+          //disp.displayInt(pumpTime);
           pumpON();
           flag = true;
         } else {
@@ -49,7 +49,7 @@ void serviceMode() {
           servoPos -= 5;
         }
         servoPos = constrain(servoPos, 0, 180);
-        disp.displayInt(servoPos);
+        //disp.displayInt(servoPos);
         rotator_servo.setTargetDeg(servoPos);
       }
 
@@ -67,10 +67,9 @@ void dispMode() {
   if (!workMode) pumpOFF();
 
   disp.runTempEffect(MatrEffect::percent(thisVolume), 1500);
-  //disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
-  
-  uint8_t* sprites[] = {heartFull, heartEmpty};
-  disp.setEffect(MatrEffect::animation(sprites, 2));
+  disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
+  //disp.setEffect(MatrEffect::sprite(smile));
+
 }
 
 // наливайка, опрос кнопок
@@ -138,7 +137,7 @@ void flowRoutnie() {
       rotator_servo.setTargetDeg(parkingPosition[Servos::ROTOR]);
       lift_servo.setTargetDeg(parkingPosition[Servos::LIFT]);
       forward_servo.setTargetDeg(parkingPosition[Servos::FORWARD]);
-      if (rotator_servo.tick() && forward_servo.tick() && lift_servo.tick()) {
+      if (rotator_servo.tick() && forward_servo.tick()) {
         systemON = false;
         parking = true;
         PRINTS("no glass");        
@@ -147,7 +146,7 @@ void flowRoutnie() {
   } else if (systemState == MOVING) {
     bool rotorCame = rotator_servo.tick();
     bool forwardCame = forward_servo.tick();
-    if (rotorCame && forwardCame && lift_servo.tick()) {  // если приехали
+    if (rotorCame && forwardCame) {  // если приехали
       systemState = PUMPING;                              // режим - наливание
       FLOWtimer.setInterval((long)thisVolume * time50ml / 50);  // перенастроили таймер
       FLOWtimer.reset();                                  // сброс таймера
@@ -170,6 +169,8 @@ void flowRoutnie() {
       PRINTS("wait");
     }
   } else if (systemState == WAIT) {
+    uint8_t* sprites[] = {smile3, smile2, smile1};
+    disp.runTempEffect(MatrEffect::animation(sprites, 3), 1500);
     if (WAITtimer.isReady()) {                            // подождали после наливания
       systemState = SEARCH;
       timeoutReset();
