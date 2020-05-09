@@ -66,10 +66,8 @@ void serviceMode() {
 void dispMode() {
   if (!workMode) pumpOFF();
 
-  disp.runTempEffect(MatrEffect::percent(thisVolume), 1500);
-  disp.setEffect(MatrEffect::symbol(workMode ? 'A' : 'M'));
-  //disp.setEffect(MatrEffect::sprite(smile));
-
+  disp.runTempEffect(MatrEffect::percent(thisVolume), 1500, true);
+  disp.setEffect(MatrEffect::sprite(workMode ? autoMode : manualMode));
 }
 
 // наливайка, опрос кнопок
@@ -78,23 +76,29 @@ void flowTick() {
     for (byte i = 0; i < NUM_SHOTS; i++) {
       bool swState = !digitalRead(SW_pins[i]) ^ SWITCH_LEVEL;
       if (swState && shotStates[i] == NO_GLASS) {  // поставили пустую рюмку
-        timeoutReset();                                             // сброс таймаута
-        shotStates[i] = EMPTY;                                      // флаг на заправку
-        strip.setLED(i, mCOLOR(RED));                               // подсветили
+
+        if (!workMode) { // TODO: refactor блять, SOLID rules 
+          uint8_t* sprites[] = {smile3, smile2, smile1};
+          disp.runTempEffect(MatrEffect::animation(sprites, 3), 3000);
+        }
+        
+        timeoutReset();
+        shotStates[i] = EMPTY;
+        strip.setLED(i, mCOLOR(RED));
         LEDchanged = true;
         //PRINTS("set glass");
         //PRINTS(i);
       }
       if (!swState && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
-        shotStates[i] = NO_GLASS;                                   // статус - нет рюмки
-        strip.setLED(i, mCOLOR(BLACK));                             // нигра
+        shotStates[i] = NO_GLASS;
+        strip.setLED(i, mCOLOR(BLACK));
         LEDchanged = true;
-        timeoutReset();                                             // сброс таймаута
+        timeoutReset();
         if (i == curPumping) {
           curPumping = -1; // снимаем выбор рюмки
           systemState = WAIT;                                       // режим работы - ждать
           WAITtimer.reset();
-          pumpOFF();                                                // помпу выкл
+          pumpOFF();
         }
         //PRINTS("take glass");
         //PRINTS(i);
@@ -157,7 +161,9 @@ void flowRoutnie() {
       //PRINTS(curPumping);
     }
 
-  } else if (systemState == PUMPING) {                    // если качаем
+  } else if (systemState == PUMPING) {        
+    uint8_t* sprites[] = {glass1, glass2, glass3};
+    disp.runTempEffect(MatrEffect::animation(sprites, 3, true), 3000);
     if (FLOWtimer.isReady()) {                            // если налили (таймер)
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
@@ -169,8 +175,7 @@ void flowRoutnie() {
       PRINTS("wait");
     }
   } else if (systemState == WAIT) {
-    uint8_t* sprites[] = {smile3, smile2, smile1};
-    disp.runTempEffect(MatrEffect::animation(sprites, 3), 1500);
+
     if (WAITtimer.isReady()) {                            // подождали после наливания
       systemState = SEARCH;
       timeoutReset();

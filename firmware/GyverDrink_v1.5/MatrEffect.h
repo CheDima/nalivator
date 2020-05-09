@@ -2,26 +2,28 @@
 #include "LinkedList.h"
 #include "macros.h"
 
-enum EffectType {SPRITE, SYMBOL, PERCENT, RUNNING_STRING, ANIMATION} ;
+enum EffectType {SPRITE, SYMBOL, PERCENT, RUNNING_STRING, ANIMATION, ANIMATION_LOOP} ;
 struct EffectParam {
   char symbol;
   int value;
   uint8_t* sprites[7];
   LinkedList<uint8_t*> spritesList;
+  bool isLooped;
 };
 
 class MatrEffect {
   public:
     MatrEffect( EffectType t, EffectParam param);
     MatrEffect();
-    void refresh(MD_MAX72XX *device, bool forceRefresh);
+    void refresh(MD_MAX72XX *device);
+    void doRefresh();
     static MatrEffect sprite(Sprite sp);
     static MatrEffect symbol(char ch);
     static MatrEffect percent(int val);
-    static MatrEffect animation(uint8_t* sprts[], byte arrLen);
-  private:
-    uint16_t timeout;
+    static MatrEffect animation(uint8_t* sprts[], byte arrLen, bool isLooped = false);
     EffectType type;
+  protected:
+    uint16_t timeout;
     MD_MAX72XX *mx;
     bool needsRefresh = true;
     EffectParam param;
@@ -29,7 +31,7 @@ class MatrEffect {
 
 MatrEffect::MatrEffect() {}
 
-MatrEffect MatrEffect::animation(uint8_t* sprts[], byte arrLen) {
+MatrEffect MatrEffect::animation(uint8_t* sprts[], byte arrLen, bool isLooped) {
   LinkedList<uint8_t*> ll;
   for (byte i = 0; i < arrLen; i++) {
     ll.Append(*sprts);
@@ -38,6 +40,7 @@ MatrEffect MatrEffect::animation(uint8_t* sprts[], byte arrLen) {
   EffectParam par;
   par.spritesList = ll;
   par.spritesList.moveToStart();
+  par.isLooped = isLooped;
   return MatrEffect(ANIMATION, par);
 }
 
@@ -59,6 +62,11 @@ MatrEffect MatrEffect::symbol(char ch) {
   return MatrEffect(SYMBOL, par);
 }
 
+
+void MatrEffect::doRefresh() {
+  needsRefresh = true;
+}
+
 //TODO
 //void displayInt(int val) {
 //  char buffer [3];
@@ -70,14 +78,18 @@ MatrEffect::MatrEffect(EffectType t, EffectParam p) {
   type = t;
 }
 
-void MatrEffect::refresh(MD_MAX72XX *mx, bool forceRefresh) {
+void MatrEffect::refresh(MD_MAX72XX *mx) {
 
-  if(needsRefresh || forceRefresh) {
+  if(needsRefresh) {
    if(type == ANIMATION) {
      EVERY_MS(500) {
       for (uint8_t i=0; i<8; i++) mx->setRow(i, param.spritesList.getCurrent()[i]);
-      if (!param.spritesList.next()) param.spritesList.moveToStart();
-      needsRefresh = true;
+      if (!param.spritesList.next()) {
+        needsRefresh = param.isLooped;
+        param.spritesList.moveToStart();
+      } else {
+        needsRefresh = true;
+      }
      }
    }
   switch(type) {

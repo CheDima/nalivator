@@ -15,7 +15,7 @@ class MatrDisplay {
     void brightness(int val);
     void clear();
     void setEffect(MatrEffect ef);
-    void runTempEffect(MatrEffect ef, uint32_t timeout);
+    void runTempEffect(MatrEffect ef, uint32_t timeout, bool forceRefresh = false);
     void tick();
     MatrDisplay();
   protected:
@@ -34,7 +34,12 @@ void MatrDisplay::setEffect(MatrEffect ef) {
   mainEffect = ef;
 }
 
-void MatrDisplay::runTempEffect(MatrEffect ef, uint32_t timeoutMs) {
+void MatrDisplay::runTempEffect(MatrEffect ef, uint32_t timeoutMs, bool forceRefresh = false) {
+  if (!forceRefresh && ef.type == tempEffect.type && tempStartTime) {
+    // This effect is active currently, let it work on
+    tempStartTime = millis();
+    return;
+  }
   tempEffect = ef;
   tempTimeout = timeoutMs;
   tempStartTime = millis();
@@ -44,13 +49,13 @@ void MatrDisplay::runTempEffect(MatrEffect ef, uint32_t timeoutMs) {
 void MatrDisplay::tick() {
   if (tempStartTime > 0) {
     if (millis() - tempStartTime < tempTimeout) {
-      tempEffect.refresh(&mx, false);
+      tempEffect.refresh(&mx);
     } else {
       tempStartTime = 0;
-      mainEffect.refresh(&mx, true);
+      mainEffect.doRefresh();
     }
   } else {
-    mainEffect.refresh(&mx, false);
+    mainEffect.refresh(&mx);
   }
 }
 
