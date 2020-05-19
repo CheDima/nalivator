@@ -13,7 +13,7 @@
 const byte shotPos[NUM_SHOTS][3] = {{135, 120, 120}, {150, 100, 60}, {100, 100, 50}, {100, 120, 110}};
 
 enum Servos {ROTOR, LIFT, FORWARD};
-const byte UPPER_POSITION = 125;
+const byte UPPER_POSITION = 160;
 const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
 
 
@@ -28,7 +28,7 @@ const long time50ml = 5500;
 #define PUMP_POWER 4
 #define PLATFORM_PIN 7 //Rotating servo
 #define FORWARD_PIN 6  //Left lever servo
-#define UPDOWN_PIN 5   //Right lever servo
+#define UPDOWN_PIN 0   //Right lever servo
 #define SERVO_ACCELERATION 0.1
 #define SERVO_SPEED 20
 #define LED_PIN 3

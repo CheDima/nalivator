@@ -77,7 +77,7 @@ void flowTick() {
       bool swState = !digitalRead(SW_pins[i]) ^ SWITCH_LEVEL;
       if (swState && shotStates[i] == NO_GLASS) {  // поставили пустую рюмку
 
-        if (!workMode) { // TODO: refactor блять, SOLID rules 
+        if (!workMode) { // TODO: refactor блять, SOLID rules  
           uint8_t* sprites[] = {smile3, smile2, smile1};
           disp.runTempEffect(MatrEffect::animation(sprites, 3), 3000);
         }

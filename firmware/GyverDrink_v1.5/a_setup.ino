@@ -1,6 +1,6 @@
 void setup() {
 #if (DEBUG == 1)
-  Serial.begin(9600);
+  //Serial.begin(9600);
   PRINTS("start");
 #endif
   if (EEPROM.read(1000) != 10) {

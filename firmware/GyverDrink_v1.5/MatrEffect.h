@@ -22,9 +22,8 @@ class MatrEffect {
     static MatrEffect percent(int val);
     static MatrEffect animation(uint8_t* sprts[], byte arrLen, bool isLooped = false);
     EffectType type;
-  protected:
+  private :
     uint16_t timeout;
-    MD_MAX72XX *mx;
     bool needsRefresh = true;
     EffectParam param;
 };
