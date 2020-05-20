@@ -37,11 +37,12 @@ class MatrEffect {
     uint16_t timeout;
     bool needsRefresh = true;
     EffectParam param;
+    uint32_t animationTimer;
 };
 
 class MatrDisplay {
   public:
-//    void runningString(char* p);
+    //    void runningString(char* p);
     void brightness(int val);
     void clear();
     void setEffect(MatrEffect ef);
@@ -49,11 +50,11 @@ class MatrDisplay {
     void tick();
     MatrDisplay(MatrDisplayDevice* concreteDevice);
   protected:
-   MatrEffect mainEffect;
-   MatrEffect tempEffect;
-   uint32_t tempTimeout;
-   uint32_t tempStartTime = 0;
-   MatrDisplayDevice* mx;
+    MatrEffect mainEffect;
+    MatrEffect tempEffect;
+    uint32_t tempTimeout;
+    uint32_t tempStartTime = 0;
+    MatrDisplayDevice* mx;
 };
 
 MatrDisplay::MatrDisplay(MatrDisplayDevice* concreteDevice) {
@@ -165,30 +166,26 @@ MatrEffect::MatrEffect(EffectType t, EffectParam p) {
 
 void MatrEffect::refresh(MatrDisplayDevice* mx) {
 
-  if(needsRefresh) {
-   if(type == ANIMATION) {
-     EVERY_MS(500) {
-        mx -> displayBitmap(param.spritesList.getCurrent());
-      if (!param.spritesList.next()) {
-        needsRefresh = param.isLooped;
-        param.spritesList.moveToStart();
-      } else {
-        needsRefresh = true;
-      }
-     }
-   }
-  switch(type) {
-    case(SPRITE):
+  if (needsRefresh) {
+    if (type == SPRITE) {
       mx -> displayBitmap(param.sprites[0]);
       needsRefresh = false;
-      break;
-    case(SYMBOL):
+    } else if (type == ANIMATION) {
+      EVERY_MS(500) {
+        animationTimer = millis();
+        mx -> displayBitmap(param.spritesList.getCurrent());
+        if (!param.spritesList.next()) {
+          needsRefresh = param.isLooped;
+          param.spritesList.moveToStart();
+        } else {
+          needsRefresh = true;
+        }
+      }
+    } else if (type == SYMBOL) {
       needsRefresh = false;
-      break;
-    case(PERCENT):
+    } else if (type == PERCENT) {
       mx -> displayPercent(param.value);
       needsRefresh = false;
-      break;
-   }
+    }
   }
 }
