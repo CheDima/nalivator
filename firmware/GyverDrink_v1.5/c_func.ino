@@ -3,7 +3,7 @@
 void serviceMode() {
   if (!digitalRead(BTN_PIN)) {
   PRINTS("Entered service mode");
-    disp.runningString("Service");
+//    disp.runningString("Service");
     while (!digitalRead(BTN_PIN));  // ждём отпускания
     delay(200);
     int servoPos = 0;
