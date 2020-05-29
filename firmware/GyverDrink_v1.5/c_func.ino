@@ -150,7 +150,7 @@ void flowRoutnie() {
   } else if (systemState == MOVING) {
     bool rotorCame = rotator_servo.tick();
     bool forwardCame = forward_servo.tick();
-    if (rotorCame && forwardCame) {  // если приехали
+    if (rotorCame && forwardCame) {                       // если приехали
       systemState = PUMPING;                              // режим - наливание
       FLOWtimer.setInterval((long)thisVolume * time50ml / 50);  // перенастроили таймер
       FLOWtimer.reset();                                  // сброс таймера
@@ -164,6 +164,7 @@ void flowRoutnie() {
   } else if (systemState == PUMPING) {        
     uint8_t* sprites[] = {glass1, glass2, glass3};
     disp.runTempEffect(MatrEffect::animation(sprites, 3, true), 3000);
+    //rotator_servo.write(rotator_servo.getTargetDeg());    // Будем поддерживать ротор, так как он тяжелый и его легко сдвинуть во время наливания, особенно если платформа стоит криво
     if (FLOWtimer.isReady()) {                            // если налили (таймер)
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов

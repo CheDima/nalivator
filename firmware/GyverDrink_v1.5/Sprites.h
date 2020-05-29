@@ -12,7 +12,7 @@ static Sprite arrow =
   0b00000000
 };
 
-static Sprite autoMode =
+static Sprite autoMode1=
 {
   0b01000000,
   0b10100000,
@@ -24,8 +24,19 @@ static Sprite autoMode =
   0b00000010
 };
 
+static Sprite autoMode =
+{
+  0b00011000,
+  0b00100100,
+  0b01000010,
+  0b01000010,
+  0b01111110,
+  0b01000010, 
+  0b01000010,
+  0b01000010
+};
 
-static Sprite manualMode =
+static Sprite manualMode1=
 {
   0b10100000,
   0b11100000,
@@ -36,6 +47,19 @@ static Sprite manualMode =
   0b00001010,
   0b00000010
 };
+
+static Sprite manualMode=
+{
+  0b00000000,
+  0b10101000,
+  0b10101000,
+  0b11111110,
+  0b10101010,
+  0b10101011, 
+  0b00000000,
+  0b00000000
+};
+
 
 static Sprite smile1 =
 {

@@ -17,6 +17,7 @@ class MdMax8x8Display : public MatrDisplayDevice {
 
 MdMax8x8Display::MdMax8x8Display(uint8_t csPin) : mx( new MD_MAX72XX(MD_MAX72XX::FC16_HW, csPin)) {
   mx->begin();
+  mx->control(MD_MAX72XX::INTENSITY, MAX_INTENSITY);
 }
 
 void MdMax8x8Display::displayBitmap(uint8_t* bmp) const {

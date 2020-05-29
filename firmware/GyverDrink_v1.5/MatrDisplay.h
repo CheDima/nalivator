@@ -1,4 +1,3 @@
-#include "Sprites.h"
 #include "LinkedList.h"
 #include "macros.h"
 
@@ -28,7 +27,7 @@ class MatrEffect {
     MatrEffect();
     void refresh(MatrDisplayDevice* mx);
     void doRefresh();
-    static MatrEffect sprite(Sprite sp);
+    static MatrEffect sprite(uint8_t* sp);
     static MatrEffect symbol(char ch);
     static MatrEffect percent(int val);
     static MatrEffect animation(uint8_t* sprts[], byte arrLen, bool isLooped = false);
@@ -136,7 +135,7 @@ MatrEffect MatrEffect::percent(int val) {
   return MatrEffect(PERCENT, par);
 }
 
-MatrEffect MatrEffect::sprite(Sprite sp) {
+MatrEffect MatrEffect::sprite(uint8_t* sp) {
   EffectParam par;
   par.sprites[0] = sp;
   return MatrEffect(SPRITE, par);

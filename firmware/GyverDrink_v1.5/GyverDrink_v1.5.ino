@@ -10,7 +10,7 @@
 // rotor: 0 - 180 ccw
 // LIFT: 70 (lowest) to 125 (highest)
 // FORWARD: 40 (short) to 120 (longest)
-const byte shotPos[NUM_SHOTS][3] = {{135, 120, 120}, {150, 100, 60}, {100, 100, 50}, {100, 120, 110}};
+const byte shotPos[NUM_SHOTS][3] = {{137, 120, 120}, {153, 100, 60}, {100, 100, 50}, {100, 120, 110}};
 
 enum Servos {ROTOR, LIFT, FORWARD};
 const byte UPPER_POSITION = 160;
@@ -20,7 +20,7 @@ const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
 
 
 // время заполнения 50 мл
-const long time50ml = 5500;
+const long time50ml = 7500;
 
 #define KEEP_POWER 0    // 1 - система поддержания питания ПБ, чтобы он не спал
 
@@ -50,6 +50,7 @@ const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
 #include "buttonMinim.h"
 #include "timer2Minim.h"
 #include "MatrDisplay.h"
+#include "Sprites.h"
 #include "MdMax8x8Display.h"
 
 // =========== ДАТА ===========
@@ -58,7 +59,6 @@ LEDdata leds[NUM_SHOTS];  // буфер ленты типа LEDdata (разме�
 microLED strip(leds, NUM_SHOTS, LED_PIN); 
 
 MatrDisplay disp = MatrDisplay (new MdMax8x8Display(DISP_CS_PIN));
-
 // пин clk, пин dt, пин sw, направление (0/1), тип (0/1)
 encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
 
