@@ -51,14 +51,15 @@ const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
 #include "timer2Minim.h"
 #include "MatrDisplay.h"
 #include "Sprites.h"
-#include "MdMax8x8Display.h"
+#include "Oled64x48Display.h"
 
 // =========== ДАТА ===========
 #define COLOR_DEBTH 2   // цветовая глубина: 1, 2, 3 (в байтах)
-LEDdata leds[NUM_SHOTS];  // буфер ленты типа LEDdata (размер зависит от COLOR_DEBTH)
-microLED strip(leds, NUM_SHOTS, LED_PIN); 
 
-MatrDisplay disp = MatrDisplay (new MdMax8x8Display(DISP_CS_PIN));
+microLED<NUM_SHOTS, LED_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB> strip;
+
+MatrDisplay disp = MatrDisplay(new Oled64x48Display());
+
 // пин clk, пин dt, пин sw, направление (0/1), тип (0/1)
 encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
 

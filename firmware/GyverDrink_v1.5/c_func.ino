@@ -31,9 +31,9 @@ void serviceMode() {
         // зажигаем светодиоды от кнопок
         for (byte i = 0; i < NUM_SHOTS; i++) {
           if (!digitalRead(SW_pins[i])) {
-            strip.setLED(i, mCOLOR(GREEN));
+            strip.leds[i] =  mGreen;
           } else {
-            strip.setLED(i, mCOLOR(BLACK));
+            strip.leds[i] =  mBlack;
           }
           strip.show();
         }
@@ -84,14 +84,14 @@ void flowTick() {
         
         timeoutReset();
         shotStates[i] = EMPTY;
-        strip.setLED(i, mCOLOR(RED));
+        strip.leds[i] =  mRed;
         LEDchanged = true;
         //PRINTS("set glass");
         //PRINTS(i);
       }
       if (!swState && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
         shotStates[i] = NO_GLASS;
-        strip.setLED(i, mCOLOR(BLACK));
+        strip.leds[i] =  mBlack;
         LEDchanged = true;
         timeoutReset();
         if (i == curPumping) {
@@ -155,7 +155,8 @@ void flowRoutnie() {
       FLOWtimer.setInterval((long)thisVolume * time50ml / 50);  // перенастроили таймер
       FLOWtimer.reset();                                  // сброс таймера
       pumpON();                                           // НАЛИВАЙ!
-      strip.setLED(curPumping, mCOLOR(YELLOW));           // зажгли цвет
+      
+      strip.leds[curPumping] = mYellow;
       strip.show();
       PRINTS("fill glass");
       //PRINTS(curPumping);
@@ -168,7 +169,7 @@ void flowRoutnie() {
     if (FLOWtimer.isReady()) {                            // если налили (таймер)
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
-      strip.setLED(curPumping, mCOLOR(LIME));             // подсветили
+      strip.leds[curPumping] =  mLime;
       strip.show();
       curPumping = -1;                                    // снимаем выбор рюмки
       systemState = WAIT;                                 // режим работы - ждать
