@@ -59,15 +59,15 @@ void serviceMode() {
       }
     }
   }
-  disp.clear();
+  tftClear();
 }
 
 // выводим объём и режим
 void dispMode() {
   if (!workMode) pumpOFF();
 
-  disp.runTempEffect(MatrEffect::percent(thisVolume), 1500, true);
-  disp.setEffect(MatrEffect::sprite(workMode ? autoMode : manualMode));
+  //disp.runTempEffect(MatrEffect::percent(thisVolume), 1500, true);
+  //disp.setEffect(MatrEffect::sprite(workMode ? autoMode : manualMode));
 }
 
 // наливайка, опрос кнопок
@@ -79,14 +79,14 @@ void flowTick() {
 
         if (!workMode) { // TODO: refactor блять, SOLID rules  
           uint8_t* sprites[] = {smile3, smile2, smile1};
-          disp.runTempEffect(MatrEffect::animation(sprites, 3), 3000);
+          //disp.runTempEffect(MatrEffect::animation(sprites, 3), 3000);
         }
         
         timeoutReset();
         shotStates[i] = EMPTY;
         strip.leds[i] =  mRed;
         LEDchanged = true;
-        //PRINTS("set glass");
+        PRINTS("set glass");
         //PRINTS(i);
       }
       if (!swState && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
@@ -100,7 +100,7 @@ void flowTick() {
           WAITtimer.reset();
           pumpOFF();
         }
-        //PRINTS("take glass");
+        PRINTS("take glass");
         //PRINTS(i);
       }
     }
@@ -164,7 +164,7 @@ void flowRoutnie() {
 
   } else if (systemState == PUMPING) {        
     uint8_t* sprites[] = {glass1, glass2, glass3};
-    disp.runTempEffect(MatrEffect::animation(sprites, 3, true), 3000);
+    //disp.runTempEffect(MatrEffect::animation(sprites, 3, true), 3000);
     //rotator_servo.write(rotator_servo.getTargetDeg());    // Будем поддерживать ротор, так как он тяжелый и его легко сдвинуть во время наливания, особенно если платформа стоит криво
     if (FLOWtimer.isReady()) {                            // если налили (таймер)
       pumpOFF();                                          // помпа выкл
@@ -201,12 +201,12 @@ void LEDtick() {
 }
 
 void displayTick() {
-  disp.tick();
+  tftTick();
 }
 
 // сброс таймаута
 void timeoutReset() {
-  if (!timeoutState) disp.brightness(7);
+  //if (!timeoutState) disp.brightness(7);
   timeoutState = true;
   TIMEOUTtimer.reset();
   TIMEOUTtimer.start();
@@ -218,7 +218,7 @@ void timeoutTick() {
   if (systemState == SEARCH && timeoutState && TIMEOUTtimer.isReady()) {
     PRINTS("timeout");
     timeoutState = false;
-    disp.brightness(1);
+    //disp.brightness(1);
     POWEROFFtimer.reset();
     jerkServo();
     if (volumeChanged) {
@@ -232,20 +232,20 @@ void timeoutTick() {
     if (!POWEROFFtimer.isReady()) {   // пока не сработал таймер полного отключения
       jerkServo();
     } else {
-      disp.clear();
+      tftClear();
     }
   }
 }
 
 void jerkServo() {
   if (KEEP_POWER) {
-    disp.brightness(7);
+//    disp.brightness(7);
     //servoON();
     rotator_servo.attach();
     rotator_servo.write(random(0, 4));
     delay(200);
     rotator_servo.detach();
     //servoOFF();
-    disp.brightness(1);
+//    disp.brightness(1);
   }
 }

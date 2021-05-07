@@ -25,14 +25,14 @@ const long time50ml = 7500;
 #define KEEP_POWER 0    // 1 - система поддержания питания ПБ, чтобы он не спал
 
 // =========== ПИНЫ ===========
-#define PUMP_POWER 4
-#define PLATFORM_PIN 7 //Rotating servo
-#define FORWARD_PIN 6  //Left lever servo
-#define UPDOWN_PIN 0   //Right lever servo
+#define PUMP_POWER 8
+#define PLATFORM_PIN 9 //Rotating servo
+#define FORWARD_PIN 10  //Left lever servo
+#define UPDOWN_PIN 11   //Right lever servo
 #define SERVO_ACCELERATION 0.1
 #define SERVO_SPEED 20
-#define LED_PIN 3
-#define BTN_PIN 2
+#define LED_PIN 6
+#define BTN_PIN 7
 
 #define ENC_SW 12
 #define ENC_DT 9
@@ -40,7 +40,7 @@ const long time50ml = 7500;
 #define DISP_CLK_PIN   13  // or SCK
 #define DISP_DATA_PIN  11  // or MOSI
 #define DISP_CS_PIN    10  // or SS
-const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
+const byte SW_pins[] = {2, 3, 4, 5};
 
 // =========== ЛИБЫ ===========
 #include <ServoSmooth.h>
@@ -49,17 +49,17 @@ const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
 #include "encUniversalMinim.h"
 #include "buttonMinim.h"
 #include "timer2Minim.h"
-#include "MatrDisplay.h"
 #include "Sprites.h"
-#include "Oled64x48Display.h"
+//#include "tft_main.h"
+#include <TFT_HX8357.h> 
 
 // =========== ДАТА ===========
 #define COLOR_DEBTH 2   // цветовая глубина: 1, 2, 3 (в байтах)
 
 microLED<NUM_SHOTS, LED_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB> strip;
 
-MatrDisplay disp = MatrDisplay(new Oled64x48Display());
-
+TFT_HX8357 tft = TFT_HX8357(); 
+  
 // пин clk, пин dt, пин sw, направление (0/1), тип (0/1)
 encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
 
@@ -82,7 +82,7 @@ int8_t curPumping = -1;
 
 enum {NO_GLASS, EMPTY, IN_PROCESS, READY} shotStates[NUM_SHOTS];
 enum {SEARCH, MOVING, WAIT, PUMPING} systemState;
-bool workMode = false;  // 0 manual, 1 auto
+bool workMode = true;  // 0 manual, 1 auto
 int thisVolume = 50;
 bool systemON = false;
 bool timeoutState = false;

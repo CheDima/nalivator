@@ -1,8 +1,8 @@
 void setup() {
-#if (DEBUG == 1)
-  //Serial.begin(9600);
+//#if (DEBUG == 1)
+  Serial.begin(38400);
   PRINTS("start");
-#endif
+//#endif
   if (EEPROM.read(1000) != 10) {
     EEPROM.write(1000, 10);
     EEPROM.put(0, thisVolume);
@@ -13,6 +13,12 @@ void setup() {
   strip.clear();
   strip.show();
   PRINTS("strip init");
+
+  tft.init();
+  tft.setRotation(1);
+  tftClear();
+  
+  analogMeter();
 
   // Pump and servos
   pinMode(PUMP_POWER, 1);
