@@ -28,22 +28,27 @@ void setup() {
   if (SWITCH_LEVEL == 0) pinMode(BTN_PIN, INPUT_PULLUP);
   // настройка серво
   //servoON();
-  rotator_servo.attach(PLATFORM_PIN, 600, 2400);
-  lift_servo.attach(UPDOWN_PIN, 600, 2400);
-  forward_servo.attach(FORWARD_PIN, 600, 2400);
+  rotator_servo.attach(ROTATING_PIN);
+  servo1.attach(SERVO1_PIN);
+  servo2.attach(SERVO2_PIN);
+  servo3.attach(SERVO3_PIN);
   rotator_servo.setSpeed(SERVO_SPEED);
   rotator_servo.setAccel(SERVO_ACCELERATION);
-  lift_servo.setSpeed(SERVO_SPEED);
-  lift_servo.setAccel(SERVO_ACCELERATION);
-  forward_servo.setSpeed(SERVO_SPEED);
-  forward_servo.setAccel(SERVO_ACCELERATION);
-
+  servo1.setSpeed(SERVO_SPEED);
+  servo1.setAccel(SERVO_ACCELERATION);
+  servo2.setSpeed(SERVO_SPEED);
+  servo2.setAccel(SERVO_ACCELERATION);
+  servo3.setSpeed(SERVO_SPEED);
+  servo3.setAccel(SERVO_ACCELERATION);
+  
   rotator_servo.write(parkingPosition[Servos::ROTOR]);
   rotator_servo.setCurrentDeg(parkingPosition[Servos::ROTOR]); 
-  forward_servo.write(parkingPosition[Servos::FORWARD]);
-  forward_servo.setCurrentDeg(parkingPosition[Servos::FORWARD]);
-  lift_servo.write(parkingPosition[Servos::LIFT]);
-  lift_servo.setCurrentDeg(parkingPosition[Servos::LIFT]);
+  servo3.write(parkingPosition[Servos::LEG3]);
+  servo3.setCurrentDeg(parkingPosition[Servos::LEG3]);
+  servo2.write(parkingPosition[Servos::LEG2]);
+  servo2.setCurrentDeg(parkingPosition[Servos::LEG2]);
+  servo1.write(parkingPosition[Servos::LEG1]);
+  servo1.setCurrentDeg(parkingPosition[Servos::LEG1]);
 
   
   //servoOFF();

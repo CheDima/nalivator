@@ -8,11 +8,11 @@
 // 4  1
 // положение серво над центрами рюмок
 // rotor: 0 - 180 ccw
-// LIFT: 70 (lowest) to 125 (highest)
-// FORWARD: 40 (short) to 120 (longest)
-const byte shotPos[NUM_SHOTS][3] = {{137, 120, 120}, {153, 100, 60}, {100, 100, 50}, {100, 120, 110}};
+// LEG1: 70 (lowest) to 125 (highest)
+// LEG2: 40 (short) to 120 (longest)
+const byte shotPos[NUM_SHOTS][4] = {{137, 120, 120, 90}, {153, 100, 60, 90}, {100, 100, 50, 90}, {100, 120, 110, 90}};
 
-enum Servos {ROTOR, LIFT, FORWARD};
+enum Servos {ROTOR, LEG1, LEG2, LEG3};
 const byte UPPER_POSITION = 160;
 const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
 
@@ -20,27 +20,31 @@ const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
 
 
 // время заполнения 50 мл
-const long time50ml = 7500;
+const long time50ml = 10000;
 
 #define KEEP_POWER 0    // 1 - система поддержания питания ПБ, чтобы он не спал
 
-// =========== ПИНЫ ===========
-#define PUMP_POWER 8
-#define PLATFORM_PIN 9 //Rotating servo
-#define FORWARD_PIN 10  //Left lever servo
-#define UPDOWN_PIN 11   //Right lever servo
-#define SERVO_ACCELERATION 0.1
-#define SERVO_SPEED 20
-#define LED_PIN 6
-#define BTN_PIN 7
-
-#define ENC_SW 12
-#define ENC_DT 9
-#define ENC_CLK 8
-#define DISP_CLK_PIN   13  // or SCK
-#define DISP_DATA_PIN  11  // or MOSI
-#define DISP_CS_PIN    10  // or SS
+//Board pins
 const byte SW_pins[] = {2, 3, 4, 5};
+#define LED_PIN 6
+
+// CONTROL pins
+#define BTN_PIN 8
+#define ENC_SW 9
+#define ENC_DT 10
+#define ENC_CLK 11
+
+//MAIN pins
+#define PUMP_POWER 14
+#define ROTATING_PIN 15 //Rotating servo
+#define SERVO1_PIN 16  //servos, from rotor to up
+#define SERVO2_PIN 17
+#define SERVO3_PIN 18
+
+#define SERVO_ACCELERATION 0
+#define SERVO_SPEED 100
+
+
 
 // =========== ЛИБЫ ===========
 #include <ServoSmooth.h>
@@ -50,22 +54,18 @@ const byte SW_pins[] = {2, 3, 4, 5};
 #include "buttonMinim.h"
 #include "timer2Minim.h"
 #include "Sprites.h"
-//#include "tft_main.h"
 #include <TFT_HX8357.h> 
-
-// =========== ДАТА ===========
-#define COLOR_DEBTH 2   // цветовая глубина: 1, 2, 3 (в байтах)
 
 microLED<NUM_SHOTS, LED_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB> strip;
 
 TFT_HX8357 tft = TFT_HX8357(); 
   
-// пин clk, пин dt, пин sw, направление (0/1), тип (0/1)
 encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
 
 ServoSmooth rotator_servo;
-ServoSmooth lift_servo;
-ServoSmooth forward_servo;
+ServoSmooth servo1;
+ServoSmooth servo2;
+ServoSmooth servo3;
 
 buttonMinim btn(BTN_PIN);
 buttonMinim encBtn(ENC_SW);
