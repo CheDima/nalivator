@@ -10,17 +10,17 @@
 // rotor: 0 - 180 ccw
 // LEG1: 70 (lowest) to 125 (highest)
 // LEG2: 40 (short) to 120 (longest)
-const byte shotPos[NUM_SHOTS][4] = {{137, 120, 120, 90}, {153, 100, 60, 90}, {100, 100, 50, 90}, {100, 120, 110, 90}};
+const byte shotPos[NUM_SHOTS][4] = {{180, 10, 120, 90}, {153, 0, 60, 90}, {115, 0, 50, 90}, {115, 10, 110, 90}};
 
 enum Servos {ROTOR, LEG1, LEG2, LEG3};
-const byte UPPER_POSITION = 160;
-const byte parkingPosition[3] = {10, UPPER_POSITION, 40};  // See Servos enum
+const byte UPPER_POSITION = 70;
+const byte parkingPosition[4] = {0, 0, 0, 90};  // See Servos enum
 
 
 
 
 // время заполнения 50 мл
-const long time50ml = 10000;
+const long time50ml = 1000;
 
 #define KEEP_POWER 0    // 1 - система поддержания питания ПБ, чтобы он не спал
 
@@ -41,12 +41,11 @@ const byte SW_pins[] = {2, 3, 4, 5};
 #define SERVO2_PIN 17
 #define SERVO3_PIN 18
 
-#define SERVO_ACCELERATION 0
-#define SERVO_SPEED 100
+#define SERVO_ACCELERATION 0.8
+
+#define SERVO_SPEED 500
 
 
-
-// =========== ЛИБЫ ===========
 #include <ServoSmooth.h>
 #include <microLED.h>
 #include <EEPROM.h>
@@ -82,12 +81,13 @@ int8_t curPumping = -1;
 
 enum {NO_GLASS, EMPTY, IN_PROCESS, READY} shotStates[NUM_SHOTS];
 enum {SEARCH, MOVING, WAIT, PUMPING} systemState;
+enum {STRAIGHTENING, STRAIGHTENED} systemSubState;
 bool workMode = true;  // 0 manual, 1 auto
 int thisVolume = 50;
 bool systemON = false;
 bool timeoutState = false;
 bool volumeChanged = false;
-bool parking = false;
+bool parked = false;
 
 // =========== МАКРО ===========
 #define pumpON() digitalWrite(PUMP_POWER, 1)

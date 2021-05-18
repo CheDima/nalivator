@@ -122,12 +122,12 @@ void flowRoutnie() {
   if (systemState == SEARCH) {
     bool noGlass = true;
     for (byte i = 0; i < NUM_SHOTS; i++) {
-      if (shotStates[i] == EMPTY && i != curPumping) {    // поиск
-        noGlass = false;                                  // флаг что нашли хоть одну рюмку
-        parking = false;
-        curPumping = i;                                   // запоминаем выбор
-        moveToUppermost();                                // we must not touch neighbour glasses
-        systemState = MOVING;                             
+      if (shotStates[i] == EMPTY && i != curPumping) {    
+        noGlass = false;                                  // we have a glass to fill
+        parked = false;
+        curPumping = i;                      
+        systemState = MOVING;
+        systemSubState = STRAIGHTENING;       // we must not touch neighbour glasses                    
         shotStates[curPumping] = IN_PROCESS;              
         rotator_servo.setTargetDeg(shotPos[curPumping][Servos::ROTOR]);
         servo1.setTargetDeg(shotPos[curPumping][Servos::LEG1]);
@@ -137,40 +137,49 @@ void flowRoutnie() {
         break;
       }
     }
-    if (noGlass && !parking) {                            // если не нашли ни одной рюмки
+    if (noGlass && !parked) {                            // no glasses to fill, PARKING
       //servoON();
-      rotator_servo.setTargetDeg(parkingPosition[Servos::ROTOR]);
-      servo1.setTargetDeg(parkingPosition[Servos::LEG1]);
-      servo2.setTargetDeg(parkingPosition[Servos::LEG2]);
-      servo3.setTargetDeg(parkingPosition[Servos::LEG3]);
-      if (rotator_servo.tick() && servo2.tick() && servo1.tick()) {
-        systemON = false;
-        parking = true;
-        PRINTS("no glass");        
+      if (straightened()) {
+        rotator_servo.setTargetDeg(parkingPosition[Servos::ROTOR]);
+        servo1.setTargetDeg(parkingPosition[Servos::LEG1]);
+        servo2.setTargetDeg(parkingPosition[Servos::LEG2]);
+        servo3.setTargetDeg(parkingPosition[Servos::LEG3]);
+        if (rotator_servo.tick() && servo2.tick() && servo1.tick()) {
+          systemON = false;
+          parked = true;
+          PRINTS("no glass");        
+        }
       }
     }
   } else if (systemState == MOVING) {
-    bool rotorReady = rotator_servo.tick();
-    bool leg3Ready = servo3.tick();
-    bool leg2Ready = servo2.tick();
-    bool leg1Ready = servo1.tick();
-    bool iAmOverShot =rotorReady && leg1Ready && leg2Ready && leg3Ready;
-    PRINTD(rotator_servo.getCurrentDeg());
-    if (iAmOverShot) {
-      systemState = PUMPING;
-      FLOWtimer.setInterval((long)thisVolume * time50ml / 50);
-      FLOWtimer.reset();
-      pumpON();
-      
-      strip.leds[curPumping] = mYellow;
-      strip.show();
-      PRINTS("fill glass");
-      //PRINTS(curPumping);
+
+    if (straightened()) {
+      servo1.setTargetDeg(shotPos[curPumping][Servos::LEG1]);
+      bool rotorInPlace = rotator_servo.tick();
+      if (!rotorInPlace) {
+        return;
+      }
+      bool servo1Ready = servo1.tick(); 
+      bool servo2Ready = servo2.tick();
+      bool servo3Ready = servo3.tick();
+      PRINTD(rotator_servo.getCurrentDeg());
+      if (servo1Ready && servo2Ready && servo3Ready) {
+        systemState = PUMPING;
+        FLOWtimer.setInterval((long)thisVolume * time50ml / 50);
+        FLOWtimer.reset();
+        pumpON();
+        
+        strip.leds[curPumping] = mYellow;
+        strip.show();
+        PRINTS("filling glass#");
+        PRINTD(curPumping);
+      }
     }
 
   } else if (systemState == PUMPING) {        
     servo1.write(servo1.getTargetDeg());    // Будем поддерживать, так как он тяжелый и его легко сдвинуть во время наливания, особенно если платформа стоит криво
     if (FLOWtimer.isReady()) {                            // если налили (таймер)
+      systemSubState = STRAIGHTENING;
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
       strip.leds[curPumping] =  mLime;
@@ -190,10 +199,19 @@ void flowRoutnie() {
   }
 }
 
-void moveToUppermost() {
-  PRINTS("Move to upper position");
-//  servo1.setTargetDeg(UPPER_POSITION);
-  //  while (!servo1.tick()); 
+bool straightened() {
+        //servoON();
+      if (systemSubState == STRAIGHTENED) {
+        return true;
+      } else {
+         servo1.setTargetDeg(UPPER_POSITION);
+         PRINTS("Moving to vertical position");
+         if (servo1.tick()) {
+          systemSubState = STRAIGHTENED;
+          return true;
+         }
+      }
+      return false;
 }
 
 // отрисовка светодиодов по флагу (100мс)
