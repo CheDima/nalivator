@@ -13,20 +13,18 @@ void encTick() {
       thisVolume -= 5;
       thisVolume = constrain(thisVolume, 5, 100);
     }
-    dispMode();
+    displayStatus();
   }
 }
 
 void btnTick() {
   if (btn.holded()) {
-    timeoutReset();
-    workMode = !workMode;
-    dispMode();
+    autoMode = !autoMode;
+    displayStatus();
   }
   if (encBtn.holded()) {
     pumpON();
     while (!digitalRead(ENC_SW));
-    timeoutReset();
     pumpOFF();
   }  
 }
