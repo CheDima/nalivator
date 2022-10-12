@@ -1,66 +1,5 @@
 // различные функции
 
-void serviceMode() {
-  if (!digitalRead(BTN_PIN)) {
-  PRINTS("Entered service mode");
-//    disp.runningString("Service");
-    while (!digitalRead(BTN_PIN));  // ждём отпускания
-    delay(200);
-    int servoPos = 0;
-    long pumpTime = 0;
-    timerMinim timer100(100);
-    //disp.displayInt(0);
-    bool flag;
-    for (;;) {
-      srvPlatform.tick();
-      enc.tick();
-
-      if (timer100.isReady()) {   // период 100 мс
-        // работа помпы со счётчиком
-        if (!digitalRead(ENC_SW)) {
-          if (flag) pumpTime += 100;
-          else pumpTime = 0;
-          //disp.displayInt(pumpTime);
-          pumpON();
-          flag = true;
-        } else {
-          pumpOFF();
-          flag = false;
-        }
-
-        // зажигаем светодиоды от кнопок
-        for (byte i = 0; i < NUM_SHOTS; i++) {
-          if (!digitalRead(SW_pins[i])) {
-            strip.leds[i] =  mGreen;
-          } else {
-            strip.leds[i] =  mBlack;
-          }
-          strip.show();
-        }
-      }
-
-      if (enc.isTurn()) {
-        pumpTime = 0;
-        if (enc.isLeft()) {
-          servoPos += 5;
-        }
-        if (enc.isRight()) {
-          servoPos -= 5;
-        }
-        servoPos = constrain(servoPos, 0, 180);
-        //disp.displayInt(servoPos);
-        srvPlatform.setTargetDeg(servoPos);
-      }
-
-      if (btn.holded()) {
-        srvPlatform.setTargetDeg(0);
-        break;
-      }
-    }
-  }
-  tftClear();
-}
-
 // triggers once on click, setup, rotate (not tick)
 void displayStatus() {
   if (!autoMode) pumpOFF();
@@ -92,7 +31,7 @@ void flowTick() {
         if (currShot == curPumping) {
           curPumping = -1; // снимаем выбор рюмки
           systemState = WAIT;
-          WAITtimer.reset();
+          waitTimer.reset();
           pumpOFF();
         }
         PRINTS("glass taken");
@@ -158,8 +97,8 @@ void flowRoutine() {
       PRINTD(srvPlatform.getCurrentDeg());
       if (servoBottomReady && servoCenter2Ready && servoTopReady) {
         systemState = PUMPING;
-        FLOWtimer.setInterval((long)thisVolume * time50ml / 50);
-        FLOWtimer.reset();
+        flowTimer.setInterval((long)thisVolume * time50ml / 50);
+        flowTimer.reset();
         pumpON();
         
         strip.leds[curPumping] = mYellow;
@@ -171,7 +110,7 @@ void flowRoutine() {
 
   } else if (systemState == PUMPING) {        
     setEffect(EFFECT_METERS);
-    if (FLOWtimer.isReady()) {                            // если налили (таймер)
+    if (flowTimer.isReady()) {                            // если налили (таймер)
       systemSubState = STRAIGHTENING;
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
@@ -179,12 +118,12 @@ void flowRoutine() {
       strip.show();
       curPumping = -1;                                    // снимаем выбор рюмки
       systemState = WAIT;                                 // режим работы - ждать
-      WAITtimer.reset();
+      waitTimer.reset();
       PRINTS("wait");
     }
   } else if (systemState == WAIT) {
 
-    if (WAITtimer.isReady()) {                            // подождали после наливания
+    if (waitTimer.isReady()) {                            // подождали после наливания
       systemState = SEARCH;
       timeoutReset();
       PRINTS("search");
@@ -209,7 +148,7 @@ bool straightened() {
 
 // отрисовка светодиодов по флагу (100мс)
 void LEDtick() {
-  if (LEDchanged && LEDtimer.isReady()) {
+  if (LEDchanged && ledTimer.isReady()) {
     LEDchanged = false;
     strip.show();
   }
