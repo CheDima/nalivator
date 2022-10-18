@@ -26,50 +26,72 @@ void setEffect(byte effect) {
 }
 
 void tftTick() {
-    if(screen.backgroundRefreshNeeded) {
-      
-      // Draw background
-      switch (screen.effect) {
-        case EFFECT_PERCENT: 
-          //am.scale = 2; 
-          //drawAnalogMeter(); 
-          break;
-        case EFFECT_METERS:
-          //am.scale = 1;
-          //metersDraw();
-          break;
-        case EFFECT_TEXT:
+}
 
-        break;
-        default: tftClear(); 
-      }
-      if (isTemporaryEffect()) {
-        screen.effectToRestore = screen.previousEffect;
-      }
-      screen.previousEffect = screen.effect;
-      screen.backgroundRefreshNeeded = false;
-    } // screen.backgroundRefreshNeeded
+
+void tftRedraw() { if ( systemState == SERVICE) {
+    disp.fillScreen(ST77XX_BLACK);
+    //disp.drawRect(0, 0, disp.width()-1, n, 255);
+    disp.setCursor(20, 20);
+    disp.setTextColor(255*8);
+    disp.setTextWrap(true);
+    disp.print("Platf: ");
+    disp.println(srvPlatform.getCurrentDeg());
+    disp.print("Bott: ");
+    disp.println(srvBottom.getCurrentDeg());
+
+    disp.print("Center: ");
+    disp.println(srvCenter.getCurrentDeg());
+
+    disp.print("Top: ");
+    disp.println(srvTop.getCurrentDeg());
+
+  }
+
+    // if(screen.backgroundRefreshNeeded) {
+      
+    //   // Draw background
+    //   switch (screen.effect) {
+    //     case EFFECT_PERCENT: 
+    //       //am.scale = 2; 
+    //       //drawAnalogMeter(); 
+    //       break;
+    //     case EFFECT_METERS:
+    //       //am.scale = 1;
+    //       //metersDraw();
+    //       break;
+    //     case EFFECT_TEXT:
+
+    //     break;
+    //     default: tftClear(); 
+    //   }
+    //   if (isTemporaryEffect()) {
+    //     screen.effectToRestore = screen.previousEffect;
+    //   }
+    //   screen.previousEffect = screen.effect;
+    //   screen.backgroundRefreshNeeded = false;
+    // } // screen.backgroundRefreshNeeded
    
 
-      // Refresh of current effect
-      switch (screen.effect) {
-        case EFFECT_PERCENT: 
-          //plotNeedle(screen.intValue, 10);
-          break;
-        case EFFECT_METERS:
-          //am.scale = 1;
-          //metersRedraw();
-          break;
-        case EFFECT_TEXT:
+    //   // Refresh of current effect
+    //   switch (screen.effect) {
+    //     case EFFECT_PERCENT: 
+    //       //plotNeedle(screen.intValue, 10);
+    //       break;
+    //     case EFFECT_METERS:
+    //       //am.scale = 1;
+    //       //metersRedraw();
+    //       break;
+    //     case EFFECT_TEXT:
 
-          break;
-        default: tftClear(); 
-      }
+    //       break;
+    //     default: tftClear(); 
+    //   }
 
-      if (isTemporaryEffect() && tftEffectTimer.isReady()) {
-        screen.effect = screen.effectToRestore;
-        screen.backgroundRefreshNeeded = true;
-      }
+    //   if (isTemporaryEffect() && tftEffectTimer.isReady()) {
+    //     screen.effect = screen.effectToRestore;
+    //     screen.backgroundRefreshNeeded = true;
+    //   }
 }
 
 

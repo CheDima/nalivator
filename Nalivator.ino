@@ -7,15 +7,15 @@
 const long time50ml = 3000;
 
 //====================== PINS =======================
-const byte SW_pins[] = {2, 3, 4, 5};
-#define LED_PIN 6
+const byte SW_pins[] = {30, 32, 34, 36};
+#define LED_PIN 38
 
 // Display pins
-#define TFT_CS        10
-#define TFT_RST        8 
-#define TFT_DC         9
+#define TFT_CS         42
+#define TFT_RST        46
+#define TFT_DC         44
 
-#define BTN_PIN 18
+#define BTN_PIN 40
 #define ENC_SW  43
 #define ENC_DT  45
 #define ENC_CLK 41
@@ -31,7 +31,7 @@ const byte SW_pins[] = {2, 3, 4, 5};
 #include "lib_timer2Minim.h"
 
 microLED<NUM_SHOTS, LED_PIN, MLED_NO_CLOCK, LED_WS2812, ORDER_GRB> strip;
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7735 disp = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
 buttonMinim btn(BTN_PIN);
 buttonMinim encBtn(ENC_SW);
@@ -54,8 +54,8 @@ bool volumeChanged = false;
 bool parked = false;
 
 // =========== MACRO ===========
-#define pumpON() srvPump.setCurrent(2500)
-#define pumpOFF() srvPump.setCurrent(500)
+#define pumpON() srvPump._servo.setPWM(SRV_PUMP_PIN, 4096, 0)
+#define pumpOFF() srvPump._servo.setPWM(SRV_PUMP_PIN, 0, 4096)
 
 #define servosLock() {srvBottom.setAutoDetach(false); srvBottom.tick(); srvCenter.setAutoDetach(false);srvCenter.tick(); srvTop.setAutoDetach(false);srvTop.tick();}
 #define servosRelease() {srvBottom.setAutoDetach(true); srvBottom.tick(); srvCenter.setAutoDetach(true); srvCenter.tick(); srvTop.setAutoDetach(true);srvTop.tick();}

@@ -14,15 +14,15 @@ void setup() {
   strip.show();
   PRINTS("strip init");
 
-  tft.initR(INITR_BLACKTAB);
+  disp.initR(INITR_BLACKTAB);
 
   for (byte i = 0; i < NUM_SHOTS; i++) {
     if (SWITCH_LEVEL == 0) pinMode(SW_pins[i], INPUT_PULLUP);
   }
   if (SWITCH_LEVEL == 0) pinMode(BTN_PIN, INPUT_PULLUP);
-  pumpOFF();
   servoSetup();
-  serviceMode();    // калибровка
+  pumpOFF();
+  serviceMode();
   displayStatus();       // выводим на дисплей стандартные значения
   PRINTS("Init finished");
 }

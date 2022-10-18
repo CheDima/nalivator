@@ -65,6 +65,7 @@ void flowRoutine() {
         srvBottom.setTargetDeg(shotPos[curPumping][Servos::BOTTOM]);
         srvCenter.setTargetDeg(shotPos[curPumping][Servos::CENTER]);
         srvTop.setTargetDeg(shotPos[curPumping][Servos::TOP]);
+        servosLock();
         PRINTS("Empty glass found. Pumping");
         //setEffect(EFFECT_METERS);
         break;
@@ -76,7 +77,11 @@ void flowRoutine() {
         srvBottom.setTargetDeg(parkingPos[Servos::BOTTOM]);
         srvCenter.setTargetDeg(parkingPos[Servos::CENTER]);
         srvTop.setTargetDeg(parkingPos[Servos::TOP]);
-        if (srvPlatform.tick() && srvCenter.tick() && srvCenter.tick()) {
+        bool rotorReady = srvPlatform.tick();
+        bool servoBottomReady = srvBottom.tick(); 
+        bool servoCenterReady = srvCenter.tick();
+        bool servoTopReady = srvTop.tick();
+        if (rotorReady && servoBottomReady && servoCenterReady && servoTopReady) {
           systemON = false;
           parked = true;
           servosRelease();
@@ -87,15 +92,12 @@ void flowRoutine() {
   } else if (systemState == MOVING) {
     if (straightened()) {
       srvBottom.setTargetDeg(shotPos[curPumping][Servos::BOTTOM]);
-      bool rotorInPlace = srvPlatform.tick();
-      if (!rotorInPlace) {
-        return;
-      }
+      bool rotorReady = srvPlatform.tick();
       bool servoBottomReady = srvBottom.tick(); 
-      bool servoCenter2Ready = srvCenter.tick();
+      bool servoCenterReady = srvCenter.tick();
       bool servoTopReady = srvTop.tick();
       PRINTD(srvPlatform.getCurrentDeg());
-      if (servoBottomReady && servoCenter2Ready && servoTopReady) {
+      if (rotorReady && servoBottomReady && servoCenterReady && servoTopReady) {
         systemState = PUMPING;
         flowTimer.setInterval((long)thisVolume * time50ml / 50);
         flowTimer.reset();
@@ -133,10 +135,11 @@ void flowRoutine() {
 
 bool straightened() {
         //servoON();
+        return true;
       if (systemSubState == STRAIGHTENED) {
         return true;
       } else {
-         srvBottom.setTargetDeg(UPPER_POSITION);
+         srvCenter.setTargetDeg(UPPER_POSITION);
          PRINTS("Moving to vertical position");
          if (srvBottom.tick()) {
           systemSubState = STRAIGHTENED;

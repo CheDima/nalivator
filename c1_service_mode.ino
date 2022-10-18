@@ -52,12 +52,14 @@ void serviceMode() {
         if (curSrv==1) {srvBottom.setTargetDeg(servoPos); srvBottom.setAutoDetach(false);} else {srvs[curSrv].setTargetDeg(servoPos); srvs[curSrv].setAutoDetach(false);}
         PRINT("srv ", curSrv);
         PRINT("pos \n", servoPos);
+        tftRedraw();
       }
       if (enc.isClick()) {
         curSrv = curSrv==3?0:curSrv+1;
         servoPos = curSrv==1 ? srvBottom.getCurrentDeg() : srvs[curSrv].getCurrentDeg();
         PRINT("srv ", curSrv);
         PRINT("pos \n", servoPos);
+        tftRedraw();
        
       }
 

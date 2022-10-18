@@ -10,15 +10,19 @@
 #define BOTTOM_L_SERVO_CORRECTION 73
 
 enum Servos {PLATFORM, BOTTOM, CENTER, TOP};
-const byte UPPER_POSITION = 50;
-const byte parkingPos[4] = {60, 130, 190, 180}; 
-// 3  2
-// 4  1
-const byte shotPos[NUM_SHOTS][4] = {{180, 10, 10, 90}, {158, 10, 120, 90}, {120, 0, 0, 90}, {120, 10, 70, 90}};
+const byte UPPER_POSITION = 170;
+const byte parkingPos[4] = {10, 145, 190, 60}; 
+// 2  3
+// 1  4
+//   PLTFRM
+
+// Platform: the more - the lefter
+// Bottom: the more - the more vertical
+// Center: the more - the lower
+// Top: the more - the closer to base
+const byte shotPos[NUM_SHOTS][4] = {{130, 130, 110, 60}, {83, 130, 100, 60}, {31, 100, 100, 60}, {31, 130, 160, 60} };
 
 ServoDriverSmooth srvPlatform(0x40, 270);
-//ServoDriverSmooth srvBottomL(0x40, 270);
-//ServoDriverSmooth srvBottomR(0x40, 270);
 ServoDriverSmooth srvCenter(0x40, 270);
 ServoDriverSmooth srvTop(0x40, 300);
 ServoDriverSmooth srvPump(0x40);
