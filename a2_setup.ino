@@ -14,12 +14,12 @@ void setup() {
   strip.show();
   PRINTS("strip init");
 
-  disp.initR(INITR_BLACKTAB);
 
   for (byte i = 0; i < NUM_SHOTS; i++) {
     if (SWITCH_LEVEL == 0) pinMode(SW_pins[i], INPUT_PULLUP);
   }
   if (SWITCH_LEVEL == 0) pinMode(BTN_PIN, INPUT_PULLUP);
+  displaySetup();
   servoSetup();
   pumpOFF();
   serviceMode();

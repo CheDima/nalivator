@@ -1,12 +1,6 @@
-// различные функции
-
 // triggers once on click, setup, rotate (not tick)
 void displayStatus() {
   if (!autoMode) pumpOFF();
-
-  setEffect(EFFECT_PERCENT);
-  screen.intValue = thisVolume;
-  //disp.setEffect(MatrEffect::sprite(autoMode ? autoMode : manualMode));
 }
 
 // наливайка, опрос кнопок
@@ -15,10 +9,6 @@ void flowTick() {
       bool switchPresssed = !digitalRead(SW_pins[currShot]) ^ SWITCH_LEVEL;
       if (switchPresssed && shotStates[currShot] == NO_GLASS) {  // поставили пустую рюмку
         servosLock(); // will be locked until it's parked
-        if (!autoMode) {
-            //setEffect(EFFECT_METERS);
-        }
-        //timeoutReset();
         shotStates[currShot] = EMPTY;
         strip.leds[currShot] =  mRed;
         LEDchanged = true;
@@ -58,21 +48,18 @@ void flowRoutine() {
         noGlass = false;                                  // we have a glass to fill
         parked = false;
         curPumping = currShot;                      
-        systemState = MOVING;
-        systemSubState = STRAIGHTENING;       // we must not touch neighbour glasses                    
+        systemState = MOVING;                
         shotStates[curPumping] = IN_PROCESS;              
-        srvPlatform.setTargetDeg(shotPos[curPumping][Servos::PLATFORM]);
-        srvBottom.setTargetDeg(shotPos[curPumping][Servos::BOTTOM]);
-        srvCenter.setTargetDeg(shotPos[curPumping][Servos::CENTER]);
-        srvTop.setTargetDeg(shotPos[curPumping][Servos::TOP]);
-        servosLock();
+        srvPlatform.setTargetDeg(shotPos[curPreset][curPumping][Servos::PLATFORM]);
+        srvBottom.setTargetDeg(shotPos[curPreset][curPumping][Servos::BOTTOM]);
+        srvCenter.setTargetDeg(shotPos[curPreset][curPumping][Servos::CENTER]);
+        srvTop.setTargetDeg(shotPos[curPreset][curPumping][Servos::TOP]);
+        //servosLock();
         PRINTS("Empty glass found. Pumping");
-        //setEffect(EFFECT_METERS);
         break;
       }
     }
     if (noGlass && !parked) {                            // no glasses to fill, PARKING
-      if (straightened()) {
         srvPlatform.setTargetDeg(parkingPos[Servos::PLATFORM]);
         srvBottom.setTargetDeg(parkingPos[Servos::BOTTOM]);
         srvCenter.setTargetDeg(parkingPos[Servos::CENTER]);
@@ -84,14 +71,12 @@ void flowRoutine() {
         if (rotorReady && servoBottomReady && servoCenterReady && servoTopReady) {
           systemON = false;
           parked = true;
-          servosRelease();
+          //servosRelease();
           PRINTS("no glass");        
         }
-      }
     }
   } else if (systemState == MOVING) {
-    if (straightened()) {
-      srvBottom.setTargetDeg(shotPos[curPumping][Servos::BOTTOM]);
+      PRINTS("Moving to target position");
       bool rotorReady = srvPlatform.tick();
       bool servoBottomReady = srvBottom.tick(); 
       bool servoCenterReady = srvCenter.tick();
@@ -102,18 +87,13 @@ void flowRoutine() {
         flowTimer.setInterval((long)thisVolume * time50ml / 50);
         flowTimer.reset();
         pumpON();
-        
         strip.leds[curPumping] = mYellow;
         strip.show();
         PRINTS("filling glass#");
         PRINTD(curPumping);
       }
-    }
-
   } else if (systemState == PUMPING) {        
-    setEffect(EFFECT_METERS);
     if (flowTimer.isReady()) {                            // если налили (таймер)
-      systemSubState = STRAIGHTENING;
       pumpOFF();                                          // помпа выкл
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
       strip.leds[curPumping] =  mLime;
@@ -141,7 +121,10 @@ bool straightened() {
       } else {
          srvCenter.setTargetDeg(UPPER_POSITION);
          PRINTS("Moving to vertical position");
-         if (srvBottom.tick()) {
+         PRINTD(srvCenter.getCurrentDeg());
+         if (srvCenter.tick()) {
+          PRINTS("Came to vertical position");
+          PRINTD(srvCenter.getCurrentDeg());
           systemSubState = STRAIGHTENED;
           return true;
          }

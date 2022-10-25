@@ -5,13 +5,13 @@
 #define SRV_TOP_PIN 4
 #define SRV_PUMP_PIN 5
 
-#define SERVO_ACCELERATION 0.4
-#define SERVO_SPEED 150
+#define SERVO_ACCELERATION 0.3
+#define SERVO_SPEED 130
 #define BOTTOM_L_SERVO_CORRECTION 73
 
 enum Servos {PLATFORM, BOTTOM, CENTER, TOP};
-const byte UPPER_POSITION = 170;
-const byte parkingPos[4] = {10, 145, 190, 60}; 
+const byte UPPER_POSITION = 76;
+const byte parkingPos[4] = {10, 145, 192, 85}; 
 // 2  3
 // 1  4
 //   PLTFRM
@@ -20,7 +20,10 @@ const byte parkingPos[4] = {10, 145, 190, 60};
 // Bottom: the more - the more vertical
 // Center: the more - the lower
 // Top: the more - the closer to base
-const byte shotPos[NUM_SHOTS][4] = {{130, 130, 110, 60}, {83, 130, 100, 60}, {31, 100, 100, 60}, {31, 130, 160, 60} };
+const byte shotPos[NUM_PRESETS][NUM_SHOTS][4] = {
+  {{133, 95, 115, 145}, {90, 90, 90, 130}, {31, 90, 90, 145}, {31, 130, 160, 120}}, // shots
+  {{133, 95, 100, 145}, {90, 90, 75, 130}, {31, 90, 75, 145}, {31, 130, 145, 120}}  // glasses
+};
 
 ServoDriverSmooth srvPlatform(0x40, 270);
 ServoDriverSmooth srvCenter(0x40, 270);
@@ -93,12 +96,12 @@ void servoSetup() {
 
   srvTop.setDirection(true); srvTop.tick();
 
-  srvPlatform.setSpeed(SERVO_SPEED);
-  srvPlatform.setAccel(SERVO_ACCELERATION);
+  srvPlatform.setSpeed(160);
+  srvPlatform.setAccel(0.6);
   srvBottom.setSpeed(SERVO_SPEED);
   srvBottom.setAccel(SERVO_ACCELERATION);
-  srvCenter.setSpeed(SERVO_SPEED);
-  srvCenter.setAccel(SERVO_ACCELERATION);
+  srvCenter.setSpeed(160);
+  srvCenter.setAccel(0.6);
   srvTop.setSpeed(SERVO_SPEED);
   srvTop.setAccel(SERVO_ACCELERATION);
   srvPlatform.tick();

@@ -13,14 +13,20 @@ void encTick() {
       thisVolume -= 5;
       thisVolume = constrain(thisVolume, 5, 100);
     }
-    displayStatus();
+    dispRefresh(DisplayMode::PERCENTAGE);
   }
 }
 
 void btnTick() {
+  if (btn.clicked()) {
+    if (curPreset) curPreset--; else curPreset++;
+    textToScroll = curPreset ? "Glass" : "Shotik";
+    dispRefresh(DisplayMode::SCROLL_TEXT);
+  }
   if (btn.holded()) {
     autoMode = !autoMode;
-    displayStatus();
+    textToScroll = autoMode ? "Mode: A" : "Mode: M";
+    dispRefresh(DisplayMode::SCROLL_TEXT);
   }
   if (encBtn.holded()) {
     pumpON();
