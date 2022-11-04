@@ -17,9 +17,9 @@ const byte SW_pins[] = {30, 32, 34, 36};
 #define TFT_DC         44
 
 #define BTN_PIN 40
-#define ENC_SW  43
+#define ENC_SW  41
 #define ENC_DT  45
-#define ENC_CLK 41
+#define ENC_CLK 43
 
 #include <MD_MAX72xx.h>
 #include <ServoDriverSmooth.h>
@@ -39,14 +39,15 @@ buttonMinim encBtn(ENC_SW);
 timerMinim ledTimer(100);
 timerMinim flowTimer(2000);
 timerMinim waitTimer(400);
-timerMinim matrTimer(8000);
+timerMinim matrTimer(11000);
+timerMinim funTimer(60000);
 
 enum {NO_GLASS, EMPTY, IN_PROCESS, READY} shotStates[NUM_SHOTS];
 enum {SEARCH, MOVING, WAIT, PUMPING, SERVICE} systemState;
 enum Presets {SHOT, GLASS};
 enum {STRAIGHTENING, STRAIGHTENED} systemSubState;
-enum class DisplayMode {MAIN_SCREEN, SCROLL_TEXT, PERCENTAGE};
-void dispRefresh(DisplayMode mode, bool mustRefresh);
+enum class DisplayMode {MAIN_SCREEN, SCROLL_TEXT, PERCENTAGE, PUMPING, MOVING, PACMAN, SPECTRUM, INVADERS};
+void dispRefresh(DisplayMode mode, int intervalMs );
 
 bool LEDchanged = false;
 bool pumping = false;

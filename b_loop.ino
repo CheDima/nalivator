@@ -4,7 +4,6 @@ void loop() {
   flowTick();
   LEDtick();
   displayTick();
-  //timeoutTick();
   tftTick();
 }
 

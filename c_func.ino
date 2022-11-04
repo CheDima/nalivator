@@ -48,22 +48,23 @@ void flowRoutine() {
         noGlass = false;                                  // we have a glass to fill
         parked = false;
         curPumping = currShot;                      
-        systemState = MOVING;                
+        systemState = MOVING;               
         shotStates[curPumping] = IN_PROCESS;              
-        srvPlatform.setTargetDeg(shotPos[curPreset][curPumping][Servos::PLATFORM]);
+        srvPlatform.setTargetDeg(shotPos[curPreset][curPumping][Servos::PLATFORM] + compensateCCW());
         srvBottom.setTargetDeg(shotPos[curPreset][curPumping][Servos::BOTTOM]);
         srvCenter.setTargetDeg(shotPos[curPreset][curPumping][Servos::CENTER]);
         srvTop.setTargetDeg(shotPos[curPreset][curPumping][Servos::TOP]);
         //servosLock();
-        PRINTS("Empty glass found. Pumping");
+        dispRefresh(DisplayMode::MOVING);
+        PRINTS("Empty glass found. Moving");
         break;
       }
     }
     if (noGlass && !parked) {                            // no glasses to fill, PARKING
-        srvPlatform.setTargetDeg(parkingPos[Servos::PLATFORM]);
-        srvBottom.setTargetDeg(parkingPos[Servos::BOTTOM]);
-        srvCenter.setTargetDeg(parkingPos[Servos::CENTER]);
-        srvTop.setTargetDeg(parkingPos[Servos::TOP]);
+        srvPlatform.setTargetDeg(parkingPos[curPreset][Servos::PLATFORM]);
+        srvBottom.setTargetDeg(parkingPos[curPreset][Servos::BOTTOM]);
+        srvCenter.setTargetDeg(parkingPos[curPreset][Servos::CENTER]);
+        srvTop.setTargetDeg(parkingPos[curPreset][Servos::TOP]);
         bool rotorReady = srvPlatform.tick();
         bool servoBottomReady = srvBottom.tick(); 
         bool servoCenterReady = srvCenter.tick();
@@ -89,6 +90,7 @@ void flowRoutine() {
         pumpON();
         strip.leds[curPumping] = mYellow;
         strip.show();
+        dispRefresh(DisplayMode::PUMPING);
         PRINTS("filling glass#");
         PRINTD(curPumping);
       }
@@ -98,6 +100,7 @@ void flowRoutine() {
       shotStates[curPumping] = READY;                     // налитая рюмка, статус: готов
       strip.leds[curPumping] =  mLime;
       strip.show();
+      dispRefresh(DisplayMode::MAIN_SCREEN);
       curPumping = -1;                                    // снимаем выбор рюмки
       systemState = WAIT;                                 // режим работы - ждать
       waitTimer.reset();
@@ -113,24 +116,6 @@ void flowRoutine() {
   }
 }
 
-bool straightened() {
-        //servoON();
-        return true;
-      if (systemSubState == STRAIGHTENED) {
-        return true;
-      } else {
-         srvCenter.setTargetDeg(UPPER_POSITION);
-         PRINTS("Moving to vertical position");
-         PRINTD(srvCenter.getCurrentDeg());
-         if (srvCenter.tick()) {
-          PRINTS("Came to vertical position");
-          PRINTD(srvCenter.getCurrentDeg());
-          systemSubState = STRAIGHTENED;
-          return true;
-         }
-      }
-      return false;
-}
 
 // отрисовка светодиодов по флагу (100мс)
 void LEDtick() {

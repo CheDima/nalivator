@@ -10,8 +10,7 @@
 #define BOTTOM_L_SERVO_CORRECTION 73
 
 enum Servos {PLATFORM, BOTTOM, CENTER, TOP};
-const byte UPPER_POSITION = 76;
-const byte parkingPos[4] = {10, 145, 192, 85}; 
+const byte parkingPos[NUM_PRESETS][4] = {{20, 150, 192, 85}, {20, 131, 31, 230}} ; 
 // 2  3
 // 1  4
 //   PLTFRM
@@ -21,8 +20,8 @@ const byte parkingPos[4] = {10, 145, 192, 85};
 // Center: the more - the lower
 // Top: the more - the closer to base
 const byte shotPos[NUM_PRESETS][NUM_SHOTS][4] = {
-  {{133, 95, 115, 145}, {90, 90, 90, 130}, {31, 90, 90, 145}, {31, 130, 160, 120}}, // shots
-  {{133, 95, 100, 145}, {90, 90, 75, 130}, {31, 90, 75, 145}, {31, 130, 145, 120}}  // glasses
+  {{133, 108, 130, 139}, {93, 90, 93, 141}, {32, 93, 100, 148}, {32, 120, 160, 115}}, // shots
+  {{133, 110, 50, 220}, {93, 85, 18, 200}, {32, 90, 30, 210}, {32, 130, 65, 210}}  // glasses
 };
 
 ServoDriverSmooth srvPlatform(0x40, 270);
@@ -84,10 +83,10 @@ void ServoWrapper::setAutoDetach(bool isReleased) {
 ServoWrapper srvBottom;
 
 void servoSetup() {
-  srvPlatform.attach(SRV_PLATFORM_PIN, parkingPos[Servos::PLATFORM]);
-  srvBottom.attach(SRV_BOTTOM_R_PIN, SRV_BOTTOM_L_PIN, parkingPos[Servos::BOTTOM]);
-  srvCenter.attach(SRV_CENTER_PIN, parkingPos[Servos::CENTER]);
-  srvTop.attach(SRV_TOP_PIN, parkingPos[Servos::TOP]);
+  srvPlatform.attach(SRV_PLATFORM_PIN, parkingPos[curPreset][Servos::PLATFORM]);
+  srvBottom.attach(SRV_BOTTOM_R_PIN, SRV_BOTTOM_L_PIN, parkingPos[curPreset][Servos::BOTTOM]);
+  srvCenter.attach(SRV_CENTER_PIN, parkingPos[curPreset][Servos::CENTER]);
+  srvTop.attach(SRV_TOP_PIN, parkingPos[curPreset][Servos::TOP]);
   srvPump.attach(SRV_PUMP_PIN, 500, 2500);
   srvPlatform._servo.setPWMFreq(50);
   srvCenter._servo.setPWMFreq(50);
@@ -110,4 +109,8 @@ void servoSetup() {
   srvTop.tick();
 
   PRINTS("Servo initialized");
+}
+
+int8_t compensateCCW() {
+  return shotPos[curPreset][curPumping][Servos::PLATFORM] < srvPlatform.getCurrentDeg() ? -10 : 0;
 }
